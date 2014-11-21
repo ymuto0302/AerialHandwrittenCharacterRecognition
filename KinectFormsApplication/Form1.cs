@@ -11,6 +11,8 @@ using Microsoft.Kinect;
 using Microsoft.Kinect.Toolkit.Interaction; // 2014.10.20 追加
 using System.Runtime.InteropServices;
 using Microsoft.Kinect.Toolkit.Controls; //2014.10.22 追加（ハンドカーソル利用のため）
+using System.Diagnostics; // for Stopwatch()
+using System.IO;
 
 namespace KinectFormsApplication
 {
@@ -18,14 +20,24 @@ namespace KinectFormsApplication
     {
         readonly int Bgr32BytesPerPixel = 4; //ピクセルあたりのバイト数
         InteractionStream interactionStream;
-        InteractionHandEventType handEventType = InteractionHandEventType.GripRelease; //パー
+        InteractionHandEventType handEventType = InteractionHandEventType.GripRelease; //初期状態＝パー
 
         Joint jointHandRight;
 
         //描画先とするImageオブジェクトを作成する
         Bitmap canvas;
 
+        int EventInterval = 10; //10[ms] 毎にタイマーを動かす
         int countColorFrame = 0;
+
+        Boolean isRecording = false;    //入力を記録中か否かを表すフラグ
+
+        string saveFileName = "";   //座標列を保存するファイル名
+
+        ////Stopwatch stopWatch;
+
+        //右手座標を保存するためのリスト
+        List<ColorImagePoint> rightHandCoordinates = new List<ColorImagePoint>();
 
         public Form1()
         {
@@ -35,9 +47,14 @@ namespace KinectFormsApplication
             canvas = new Bitmap(pictureBoxHand.Width, pictureBoxHand.Height);
 
             //タイマー
-            eventTimer.Interval = 100; // interval : 100 ms
+            eventTimer.Interval = EventInterval; // interval
             eventTimer.Tick += new System.EventHandler(eventTimer_Tick);
             eventTimer.Enabled = true;
+
+            //ストップウォッチ
+            // http://msdn.microsoft.com/ja-jp/library/cc708866.aspx
+            /////stopWatch = new Stopwatch();
+            /////stopWatch.Start();
 
             try
             {
@@ -289,8 +306,6 @@ namespace KinectFormsApplication
                                 {
                                     rawXtextBox.Text = String.Format("{0:0.000}", hand.RawX);
                                     rawYtextBox.Text = String.Format("{0:0.000}", hand.RawY);
-                                    XtextBox.Text = String.Format("{0:0.000}", hand.X);
-                                    YtextBox.Text = String.Format("{0:0.000}", hand.Y);
                                 }
                                 
 
@@ -388,7 +403,8 @@ namespace KinectFormsApplication
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            setSaveFileName();
+            labelSaveFileName.Text = saveFileName;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -408,11 +424,16 @@ namespace KinectFormsApplication
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void erasePictureBoxHand()
         {
             Graphics g = Graphics.FromImage(canvas);
             g.Clear(Color.White);
             pictureBoxHand.Refresh();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            erasePictureBoxHand();
         }
 
         //KinectRegion の利用（ハンドカーソル）(2014.10.22)
@@ -504,10 +525,19 @@ namespace KinectFormsApplication
                         }
                     }
 
-                    if(handEventType == InteractionHandEventType.Grip){
+                    if(isRecording && handEventType == InteractionHandEventType.Grip){
                         ColorImagePoint point = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(jointHandRight.Position, kinect.ColorStream.Format);
+
+                        //countColorFrame は EventInterval [ms] 毎に１ずつ増加するため
+                        //乗算によって正確な ms 単位の経過時間が得られる。
+                        //以下では 100[ms] 毎に座標を記録する。
+                        if ((countColorFrame * EventInterval) % 10 == 0)
+                        {
+                            rightHandCoordinates.Add(point);
+                        }
+
                         gHand.DrawEllipse(new Pen(Brushes.Red), new Rectangle(point.X, point.Y, 10, 10)); 
-                                        
+
                         //リソースを解放する
                         gHand.Dispose();
                         //PictureBox1に表示する
@@ -519,5 +549,84 @@ namespace KinectFormsApplication
             }
         }
 
+        //アプリケーションの終了
+        private void finishButton_Click(object sender, EventArgs e)
+        {
+            StopKinect(KinectSensor.KinectSensors[0]);
+
+            //アプリケーションの終了
+            this.Close();
+        }
+
+        private string getCurrentDateTime()
+        {
+            string dt = String.Format("{0:yyyyMMdd}_{1:hhmmss}", System.DateTime.Today, System.DateTime.Now);
+            return dt;
+        }
+
+        private void setSaveFileName()
+        {
+            string prefix = textBoxSaveFileNamePrefix.Text;
+            saveFileName = prefix + "_" + getCurrentDateTime() + ".log";
+        }
+
+        private void buttonStartInput_Click(object sender, EventArgs e)
+        {
+            setSaveFileName();
+            labelSaveFileName.Text = saveFileName;
+
+            isRecording = true;
+            buttonStartInput.Enabled = false;
+            buttonFinishInput.Enabled = true;
+            buttonAbortInput.Enabled = true;
+        }
+
+        private void buttonFinishInput_Click(object sender, EventArgs e)
+        {
+            //記録した右手座標をコンソールに出力（とりあえず）
+            StreamWriter sw = new StreamWriter(new FileStream(saveFileName, FileMode.Create));
+            foreach (ColorImagePoint pt in rightHandCoordinates)
+            {
+                sw.WriteLine("{0:000} {1:000}", pt.X, pt.Y);
+                //System.Console.WriteLine("(%d, %d)", pt.X, pt.Y);
+            }
+            sw.Close();
+
+            //保存完了メッセージを表示するメッセージボックス
+            // http://dobon.net/vb/dotnet/form/msgbox.html
+            string msg = "ファイル " + saveFileName + " に保存しました"; 
+            MessageBox.Show(msg, "保存完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            //筆跡を描画する pictureBox のクリア
+            erasePictureBoxHand();
+
+            //右手座標列を保存しているリストを空にする
+            rightHandCoordinates.Clear();
+
+            isRecording = false;
+            buttonStartInput.Enabled = true;
+            buttonFinishInput.Enabled = false;
+            buttonAbortInput.Enabled = false;
+
+        }
+
+        private void buttonAbortInput_Click(object sender, EventArgs e)
+        {
+            rightHandCoordinates.Clear();
+
+            //筆跡を描画する pictureBox のクリア
+            erasePictureBoxHand();
+
+            isRecording = false;
+            buttonStartInput.Enabled = true;
+            buttonFinishInput.Enabled = false;
+            buttonAbortInput.Enabled = false;
+        }
+
+        private void textBoxSaveFileNamePrefix_Changed(object sender, EventArgs e)
+        {
+            setSaveFileName();
+            labelSaveFileName.Text = saveFileName;
+        }
     }
 }
