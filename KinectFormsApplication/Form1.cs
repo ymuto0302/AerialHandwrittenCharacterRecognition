@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using Microsoft.Kinect;
 using Microsoft.Kinect.Toolkit.Interaction; // 2014.10.20 追加
 using System.Runtime.InteropServices;
-
+using Microsoft.Kinect.Toolkit.Controls; //2014.10.22 追加（ハンドカーソル利用のため）
 
 namespace KinectFormsApplication
 {
@@ -25,7 +25,7 @@ namespace KinectFormsApplication
         //描画先とするImageオブジェクトを作成する
         Bitmap canvas;
 
-       
+        int countColorFrame = 0;
 
         public Form1()
         {
@@ -73,6 +73,8 @@ namespace KinectFormsApplication
         /// <param name="e"></param>
         private void StartKinect(KinectSensor kinect)
         {
+            kinect.ColorStream.CameraSettings.FrameInterval = 1000;
+            kinect.ColorStream.CameraSettings.AutoExposure = false;
 
             kinect.ColorStream.Enable();
             kinect.DepthStream.Enable();
@@ -95,6 +97,9 @@ namespace KinectFormsApplication
             }
 
             comboBoxRange.SelectedIndex = 0;
+
+            //KinectRegion の利用（ハンドカーソル）(2014.10.22)
+            //KinectRegion.AddHandPointerPressHandler((System.Windows.UIElement)this.button1, OnHandPointerPress);
         }
 
         private void StopKinect(KinectSensor kinect)
@@ -109,7 +114,7 @@ namespace KinectFormsApplication
                     kinect.Dispose();
 
                     pictureBoxRgb.Image = null;
-                    pictureBoxDepth.Image = null;
+                    //pictureBoxDepth.Image = null;
                     pictureBoxHand.BackColor = Color.Green;
                 }
             }
@@ -122,6 +127,7 @@ namespace KinectFormsApplication
         /// <param name="e"></param>
         void kinect_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
+
             try
             {
                 KinectSensor kinect = sender as KinectSensor;
@@ -129,6 +135,12 @@ namespace KinectFormsApplication
                 {
                     return;
                 }
+                String kinectInfo = "kinect.status : " + kinect.Status + System.Environment.NewLine
+                    +"ColorStream.Format : " + kinect.ColorStream.Format + System.Environment.NewLine
+                    + "CameraSettings.FrameInterval : " + kinect.ColorStream.CameraSettings.FrameInterval + System.Environment.NewLine
+                    + "CameraSettings.MinFrameInterval : " + kinect.ColorStream.CameraSettings.MinFrameInterval + System.Environment.NewLine
+                    +"CameraSettings.MaxFrameInterval : " + kinect.ColorStream.CameraSettings.MaxFrameInterval;
+                kinectInforamtionTextBox.Text = kinectInfo;
 
                 //現在の日付を利用して bitmap を書き込むファイル名を決定
                 DateTime dt = System.DateTime.Now;
@@ -140,6 +152,9 @@ namespace KinectFormsApplication
                 {
                     if (colorFrame != null)
                     {
+                        kinectInforamtionTextBox.Text = countColorFrame.ToString();
+                        countColorFrame += 1;
+
                         //RGBカメラのピクセルデータの取得
                         byte[] colorPixel = new byte[colorFrame.PixelDataLength];
                         colorFrame.CopyPixelDataTo(colorPixel);
@@ -261,11 +276,22 @@ namespace KinectFormsApplication
                         {
                             foreach (var hand in user.HandPointers)
                             {
+                                //右手座標の表示
+                                if (hand.HandEventType != 0 && hand.HandType == InteractionHandType.Right)
+                                {
+                                    rawXtextBox.Text = String.Format("{0:0.000}", hand.RawX);
+                                    rawYtextBox.Text = String.Format("{0:0.000}", hand.RawY);
+                                    XtextBox.Text = String.Format("{0:0.000}", hand.X);
+                                    YtextBox.Text = String.Format("{0:0.000}", hand.Y);
+                                }
+                                
+
                                 //Console.WriteLine(hand.HandType); // output : Left or Right
                                 //Console.WriteLine(hand.HandEventType); //output : None , Grid or GripRelease
-                                if (hand.HandEventType != 0)
+                                if (hand.HandEventType != 0 && hand.HandType == InteractionHandType.Right)
                                 {
-                                    handConditionTextBox.Text = hand.HandEventType.ToString();
+                                    handConditionTextBox.Text = hand.HandType.ToString() + " : " + hand.HandEventType.ToString();
+
 
                                     handEventType = hand.HandEventType;
 
@@ -381,6 +407,11 @@ namespace KinectFormsApplication
             pictureBoxHand.Refresh();
         }
 
+        //KinectRegion の利用（ハンドカーソル）(2014.10.22)
+        private void OnHandPointerPress(object sender, EventArgs e)
+        {
+            Console.WriteLine("test");
+        }
 
     }
 }
