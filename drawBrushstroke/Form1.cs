@@ -78,7 +78,11 @@ namespace drawBrushstroke
             //string filename = "out.txt";
             foreach (var point in pointList)
             {
-                g.DrawEllipse(new Pen(Brushes.Red), new Rectangle(point.X - R, point.Y - R, R * 2, R * 2));
+                //（注意）pointList に格納されている点は「横軸：右向き，縦軸：上向き」の座標系に従う。
+                //一方，描画時，縦軸は下向きが正であるため，予め変換しておく。
+                int x = point.X;
+                int y = pictureBox1.Height - point.Y;
+                g.DrawEllipse(new Pen(Brushes.Red), new Rectangle(x - R, y - R, R * 2, R * 2));
 
                 pictureBox1.Image = canvas;
 
@@ -130,8 +134,11 @@ namespace drawBrushstroke
                 }
 
                 //矢印の描画
-                Point endPoint = new Point(begin.X + 8*bases[bestBase].X, begin.Y + 8*bases[bestBase].Y);
-                g.DrawLine(arrowPen, begin, endPoint);
+                //（注意）pointList に格納されている点は「横軸：右向き，縦軸：上向き」の座標系に従う。
+                //一方，描画時，縦軸は下向きが正であるため，予め変換しておく。
+                Point beginPoint = new Point(begin.X, pictureBoxVector.Height - begin.Y);
+                Point endPoint = new Point(begin.X + 8*bases[bestBase].X, pictureBoxVector.Height - (begin.Y + 8*bases[bestBase].Y));
+                g.DrawLine(arrowPen, beginPoint, endPoint);
 
                 pictureBoxVector.Image = canvasVector;
 

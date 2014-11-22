@@ -54,6 +54,7 @@
             this.labelSaveFileName = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.textBoxSaveFileNamePrefix = new System.Windows.Forms.TextBox();
+            this.linkLabelMoreInfo = new System.Windows.Forms.LinkLabel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRgb)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHand)).BeginInit();
             this.SuspendLayout();
@@ -80,9 +81,9 @@
             // 
             this.handConditionTextBox.Font = new System.Drawing.Font("MS UI Gothic", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.handConditionTextBox.ForeColor = System.Drawing.Color.Red;
-            this.handConditionTextBox.Location = new System.Drawing.Point(147, 27);
+            this.handConditionTextBox.Location = new System.Drawing.Point(149, 27);
             this.handConditionTextBox.Name = "handConditionTextBox";
-            this.handConditionTextBox.Size = new System.Drawing.Size(275, 34);
+            this.handConditionTextBox.Size = new System.Drawing.Size(275, 43);
             this.handConditionTextBox.TabIndex = 3;
             this.handConditionTextBox.Text = "";
             // 
@@ -98,7 +99,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(831, 93);
+            this.button1.Location = new System.Drawing.Point(831, 171);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(115, 23);
             this.button1.TabIndex = 5;
@@ -144,7 +145,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(10, 70);
+            this.label8.Location = new System.Drawing.Point(433, 512);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(76, 12);
             this.label8.TabIndex = 11;
@@ -152,14 +153,14 @@
             // 
             // frameCounterTextBox
             // 
-            this.frameCounterTextBox.Location = new System.Drawing.Point(92, 70);
+            this.frameCounterTextBox.Location = new System.Drawing.Point(513, 509);
             this.frameCounterTextBox.Name = "frameCounterTextBox";
             this.frameCounterTextBox.Size = new System.Drawing.Size(100, 19);
             this.frameCounterTextBox.TabIndex = 12;
             // 
             // finishButton
             // 
-            this.finishButton.Location = new System.Drawing.Point(833, 122);
+            this.finishButton.Location = new System.Drawing.Point(832, 93);
             this.finishButton.Name = "finishButton";
             this.finishButton.Size = new System.Drawing.Size(115, 22);
             this.finishButton.TabIndex = 13;
@@ -170,7 +171,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(515, 35);
+            this.label1.Location = new System.Drawing.Point(577, 12);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(12, 12);
             this.label1.TabIndex = 0;
@@ -179,7 +180,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(652, 35);
+            this.label2.Location = new System.Drawing.Point(661, 12);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(12, 12);
             this.label2.TabIndex = 1;
@@ -187,22 +188,22 @@
             // 
             // rawXtextBox
             // 
-            this.rawXtextBox.Location = new System.Drawing.Point(533, 32);
+            this.rawXtextBox.Location = new System.Drawing.Point(595, 9);
             this.rawXtextBox.Name = "rawXtextBox";
-            this.rawXtextBox.Size = new System.Drawing.Size(100, 19);
+            this.rawXtextBox.Size = new System.Drawing.Size(50, 19);
             this.rawXtextBox.TabIndex = 2;
             // 
             // rawYtextBox
             // 
-            this.rawYtextBox.Location = new System.Drawing.Point(670, 32);
+            this.rawYtextBox.Location = new System.Drawing.Point(679, 9);
             this.rawYtextBox.Name = "rawYtextBox";
-            this.rawYtextBox.Size = new System.Drawing.Size(100, 19);
+            this.rawYtextBox.Size = new System.Drawing.Size(50, 19);
             this.rawYtextBox.TabIndex = 3;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(502, 17);
+            this.label3.Location = new System.Drawing.Point(445, 12);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(121, 12);
             this.label3.TabIndex = 14;
@@ -225,7 +226,7 @@
             this.buttonFinishInput.Name = "buttonFinishInput";
             this.buttonFinishInput.Size = new System.Drawing.Size(114, 22);
             this.buttonFinishInput.TabIndex = 16;
-            this.buttonFinishInput.Text = "入力終了";
+            this.buttonFinishInput.Text = "入力終了 (保存)";
             this.buttonFinishInput.UseVisualStyleBackColor = true;
             this.buttonFinishInput.Click += new System.EventHandler(this.buttonFinishInput_Click);
             // 
@@ -243,7 +244,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(502, 77);
+            this.label4.Location = new System.Drawing.Point(444, 58);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(85, 12);
             this.label4.TabIndex = 18;
@@ -252,7 +253,7 @@
             // labelSaveFileName
             // 
             this.labelSaveFileName.AutoSize = true;
-            this.labelSaveFileName.Location = new System.Drawing.Point(613, 77);
+            this.labelSaveFileName.Location = new System.Drawing.Point(529, 60);
             this.labelSaveFileName.Name = "labelSaveFileName";
             this.labelSaveFileName.Size = new System.Drawing.Size(0, 12);
             this.labelSaveFileName.TabIndex = 19;
@@ -260,7 +261,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(502, 58);
+            this.label9.Location = new System.Drawing.Point(444, 35);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(143, 12);
             this.label9.TabIndex = 20;
@@ -268,18 +269,30 @@
             // 
             // textBoxSaveFileNamePrefix
             // 
-            this.textBoxSaveFileNamePrefix.Location = new System.Drawing.Point(650, 55);
+            this.textBoxSaveFileNamePrefix.Location = new System.Drawing.Point(593, 32);
             this.textBoxSaveFileNamePrefix.Name = "textBoxSaveFileNamePrefix";
             this.textBoxSaveFileNamePrefix.Size = new System.Drawing.Size(98, 19);
             this.textBoxSaveFileNamePrefix.TabIndex = 21;
             this.textBoxSaveFileNamePrefix.Text = "sample";
             this.textBoxSaveFileNamePrefix.TextChanged += new System.EventHandler(this.textBoxSaveFileNamePrefix_Changed);
             // 
+            // linkLabelMoreInfo
+            // 
+            this.linkLabelMoreInfo.AutoSize = true;
+            this.linkLabelMoreInfo.Location = new System.Drawing.Point(803, 579);
+            this.linkLabelMoreInfo.Name = "linkLabelMoreInfo";
+            this.linkLabelMoreInfo.Size = new System.Drawing.Size(145, 12);
+            this.linkLabelMoreInfo.TabIndex = 22;
+            this.linkLabelMoreInfo.TabStop = true;
+            this.linkLabelMoreInfo.Text = "Click here to get more info.";
+            this.linkLabelMoreInfo.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelMoreInfo_LinkClicked);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(960, 603);
+            this.Controls.Add(this.linkLabelMoreInfo);
             this.Controls.Add(this.textBoxSaveFileNamePrefix);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.labelSaveFileName);
@@ -305,7 +318,7 @@
             this.Controls.Add(this.comboBoxRange);
             this.Controls.Add(this.pictureBoxRgb);
             this.Name = "Form1";
-            this.Text = "KinectApplication";
+            this.Text = "Aerial hand written character recognition : Data entry";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRgb)).EndInit();
@@ -342,6 +355,7 @@
         private System.Windows.Forms.Label labelSaveFileName;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxSaveFileNamePrefix;
+        private System.Windows.Forms.LinkLabel linkLabelMoreInfo;
     }
 }
 

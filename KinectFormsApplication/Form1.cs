@@ -36,7 +36,7 @@ namespace KinectFormsApplication
 
         ////Stopwatch stopWatch;
 
-        //右手座標を保存するためのリスト
+        //右手座標とその取得時刻を保存するためのリスト
         List<ColorImagePoint> rightHandCoordinates = new List<ColorImagePoint>();
 
         public Form1()
@@ -302,11 +302,13 @@ namespace KinectFormsApplication
                             foreach (var hand in user.HandPointers)
                             {
                                 //右手座標の表示
+                                /*
                                 if (hand.HandEventType != 0 && hand.HandType == InteractionHandType.Right)
                                 {
                                     rawXtextBox.Text = String.Format("{0:0.000}", hand.RawX);
                                     rawYtextBox.Text = String.Format("{0:0.000}", hand.RawY);
                                 }
+                                */
                                 
 
                                 //Console.WriteLine(hand.HandType); // output : Left or Right
@@ -405,6 +407,9 @@ namespace KinectFormsApplication
         {
             setSaveFileName();
             labelSaveFileName.Text = saveFileName;
+
+            linkLabelMoreInfo.Text = "Click here to get more info.";
+            linkLabelMoreInfo.Links.Add(6, 4, "www.amazon.com");
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -514,6 +519,11 @@ namespace KinectFormsApplication
                         //右手ジョイントの位置を保存
                         jointHandRight = skeleton.Joints[JointType.HandRight];
 
+                        //右手座標の表示
+                        ColorImagePoint rightHandPoint = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(jointHandRight.Position, kinect.ColorStream.Format);
+                        rawXtextBox.Text = String.Format("{0:000}", rightHandPoint.X);
+                        rawYtextBox.Text = String.Format("{0:000}", rightHandPoint.Y);
+
                         //ジョイントの描画
                         foreach (Joint joint in skeleton.Joints)
                         {
@@ -530,9 +540,11 @@ namespace KinectFormsApplication
 
                         //countColorFrame は EventInterval [ms] 毎に１ずつ増加するため
                         //乗算によって正確な ms 単位の経過時間が得られる。
-                        //以下では 100[ms] 毎に座標を記録する。
-                        if ((countColorFrame * EventInterval) % 10 == 0)
+                        //以下では 10[ms] 毎に座標を記録する。
+                        long t = countColorFrame * EventInterval;
+                        if (t % 10 == 0)
                         {
+                            //rightHandCoordinates.Add(point);
                             rightHandCoordinates.Add(point);
                         }
 
@@ -570,6 +582,7 @@ namespace KinectFormsApplication
             saveFileName = prefix + "_" + getCurrentDateTime() + ".log";
         }
 
+        //入力開始ボタン
         private void buttonStartInput_Click(object sender, EventArgs e)
         {
             setSaveFileName();
@@ -581,13 +594,16 @@ namespace KinectFormsApplication
             buttonAbortInput.Enabled = true;
         }
 
+        //入力終了ボタン
         private void buttonFinishInput_Click(object sender, EventArgs e)
         {
             //記録した右手座標をコンソールに出力（とりあえず）
             StreamWriter sw = new StreamWriter(new FileStream(saveFileName, FileMode.Create));
             foreach (ColorImagePoint pt in rightHandCoordinates)
             {
-                sw.WriteLine("{0:000} {1:000}", pt.X, pt.Y);
+                //（注意）pt が従う座標系の縦軸は「下向きに正」であるため，その向きを反転する
+                //（メモ）DPマッチングにおいてベクトルを扱う際，この変換が必要となる
+                sw.WriteLine("{0,0:000} {1,0:000}", pt.X, pictureBoxRgb.Height - pt.Y);
                 //System.Console.WriteLine("(%d, %d)", pt.X, pt.Y);
             }
             sw.Close();
@@ -610,12 +626,16 @@ namespace KinectFormsApplication
 
         }
 
+        //入力中断ボタン
         private void buttonAbortInput_Click(object sender, EventArgs e)
         {
             rightHandCoordinates.Clear();
 
             //筆跡を描画する pictureBox のクリア
             erasePictureBoxHand();
+
+            //右手座標列を保存しているリストを空にする
+            rightHandCoordinates.Clear();
 
             isRecording = false;
             buttonStartInput.Enabled = true;
@@ -627,6 +647,11 @@ namespace KinectFormsApplication
         {
             setSaveFileName();
             labelSaveFileName.Text = saveFileName;
+        }
+
+        private void linkLabelMoreInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.Link.LinkData.ToString());
         }
     }
 }
