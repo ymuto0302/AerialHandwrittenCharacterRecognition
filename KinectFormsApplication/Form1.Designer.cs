@@ -46,7 +46,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.rawXtextBox = new System.Windows.Forms.TextBox();
             this.rawYtextBox = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.buttonStartInput = new System.Windows.Forms.Button();
             this.buttonFinishInput = new System.Windows.Forms.Button();
             this.buttonAbortInput = new System.Windows.Forms.Button();
@@ -55,6 +54,15 @@
             this.label9 = new System.Windows.Forms.Label();
             this.textBoxSaveFileNamePrefix = new System.Windows.Forms.TextBox();
             this.linkLabelMoreInfo = new System.Windows.Forms.LinkLabel();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.SkeletonPointXtextBox = new System.Windows.Forms.TextBox();
+            this.SkeletonPointYtextBox = new System.Windows.Forms.TextBox();
+            this.SkeletonPointZtextBox = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRgb)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHand)).BeginInit();
             this.SuspendLayout();
@@ -62,7 +70,7 @@
             // pictureBoxRgb
             // 
             this.pictureBoxRgb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBoxRgb.Location = new System.Drawing.Point(12, 98);
+            this.pictureBoxRgb.Location = new System.Drawing.Point(12, 104);
             this.pictureBoxRgb.Name = "pictureBoxRgb";
             this.pictureBoxRgb.Size = new System.Drawing.Size(400, 400);
             this.pictureBoxRgb.TabIndex = 0;
@@ -79,11 +87,12 @@
             // 
             // handConditionTextBox
             // 
-            this.handConditionTextBox.Font = new System.Drawing.Font("MS UI Gothic", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.handConditionTextBox.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.handConditionTextBox.ForeColor = System.Drawing.Color.Red;
-            this.handConditionTextBox.Location = new System.Drawing.Point(149, 27);
+            this.handConditionTextBox.Location = new System.Drawing.Point(218, 27);
+            this.handConditionTextBox.Multiline = false;
             this.handConditionTextBox.Name = "handConditionTextBox";
-            this.handConditionTextBox.Size = new System.Drawing.Size(275, 43);
+            this.handConditionTextBox.Size = new System.Drawing.Size(276, 27);
             this.handConditionTextBox.TabIndex = 3;
             this.handConditionTextBox.Text = "";
             // 
@@ -91,7 +100,7 @@
             // 
             this.pictureBoxHand.BackColor = System.Drawing.Color.White;
             this.pictureBoxHand.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBoxHand.Location = new System.Drawing.Point(418, 98);
+            this.pictureBoxHand.Location = new System.Drawing.Point(418, 104);
             this.pictureBoxHand.Name = "pictureBoxHand";
             this.pictureBoxHand.Size = new System.Drawing.Size(400, 400);
             this.pictureBoxHand.TabIndex = 4;
@@ -112,9 +121,9 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(147, 12);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(65, 12);
+            this.label5.Size = new System.Drawing.Size(62, 12);
             this.label5.TabIndex = 7;
-            this.label5.Text = "hand status";
+            this.label5.Text = "Right Hand";
             // 
             // label6
             // 
@@ -171,7 +180,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(577, 12);
+            this.label1.Location = new System.Drawing.Point(256, 84);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(12, 12);
             this.label1.TabIndex = 0;
@@ -180,7 +189,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(661, 12);
+            this.label2.Location = new System.Drawing.Point(339, 84);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(12, 12);
             this.label2.TabIndex = 1;
@@ -188,26 +197,17 @@
             // 
             // rawXtextBox
             // 
-            this.rawXtextBox.Location = new System.Drawing.Point(595, 9);
+            this.rawXtextBox.Location = new System.Drawing.Point(274, 81);
             this.rawXtextBox.Name = "rawXtextBox";
             this.rawXtextBox.Size = new System.Drawing.Size(50, 19);
             this.rawXtextBox.TabIndex = 2;
             // 
             // rawYtextBox
             // 
-            this.rawYtextBox.Location = new System.Drawing.Point(679, 9);
+            this.rawYtextBox.Location = new System.Drawing.Point(357, 81);
             this.rawYtextBox.Name = "rawYtextBox";
             this.rawYtextBox.Size = new System.Drawing.Size(50, 19);
             this.rawYtextBox.TabIndex = 3;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(445, 12);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(121, 12);
-            this.label3.TabIndex = 14;
-            this.label3.Text = "right hand\'s coordinate";
             // 
             // buttonStartInput
             // 
@@ -244,7 +244,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(444, 58);
+            this.label4.Location = new System.Drawing.Point(545, 33);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(85, 12);
             this.label4.TabIndex = 18;
@@ -253,7 +253,7 @@
             // labelSaveFileName
             // 
             this.labelSaveFileName.AutoSize = true;
-            this.labelSaveFileName.Location = new System.Drawing.Point(529, 60);
+            this.labelSaveFileName.Location = new System.Drawing.Point(629, 37);
             this.labelSaveFileName.Name = "labelSaveFileName";
             this.labelSaveFileName.Size = new System.Drawing.Size(0, 12);
             this.labelSaveFileName.TabIndex = 19;
@@ -261,7 +261,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(444, 35);
+            this.label9.Location = new System.Drawing.Point(544, 12);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(143, 12);
             this.label9.TabIndex = 20;
@@ -269,7 +269,7 @@
             // 
             // textBoxSaveFileNamePrefix
             // 
-            this.textBoxSaveFileNamePrefix.Location = new System.Drawing.Point(593, 32);
+            this.textBoxSaveFileNamePrefix.Location = new System.Drawing.Point(693, 9);
             this.textBoxSaveFileNamePrefix.Name = "textBoxSaveFileNamePrefix";
             this.textBoxSaveFileNamePrefix.Size = new System.Drawing.Size(98, 19);
             this.textBoxSaveFileNamePrefix.TabIndex = 21;
@@ -287,11 +287,95 @@
             this.linkLabelMoreInfo.Text = "Click here to get more info.";
             this.linkLabelMoreInfo.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelMoreInfo_LinkClicked);
             // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(171, 84);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(58, 12);
+            this.label11.TabIndex = 25;
+            this.label11.Text = "ColorPoint";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(171, 63);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(75, 12);
+            this.label12.TabIndex = 26;
+            this.label12.Text = "SkeletonPoint";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(256, 62);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(12, 12);
+            this.label10.TabIndex = 27;
+            this.label10.Text = "X";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(339, 60);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(12, 12);
+            this.label13.TabIndex = 28;
+            this.label13.Text = "Y";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(426, 61);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(12, 12);
+            this.label14.TabIndex = 29;
+            this.label14.Text = "Z";
+            // 
+            // SkeletonPointXtextBox
+            // 
+            this.SkeletonPointXtextBox.Location = new System.Drawing.Point(274, 58);
+            this.SkeletonPointXtextBox.Name = "SkeletonPointXtextBox";
+            this.SkeletonPointXtextBox.Size = new System.Drawing.Size(50, 19);
+            this.SkeletonPointXtextBox.TabIndex = 30;
+            // 
+            // SkeletonPointYtextBox
+            // 
+            this.SkeletonPointYtextBox.Location = new System.Drawing.Point(360, 59);
+            this.SkeletonPointYtextBox.Name = "SkeletonPointYtextBox";
+            this.SkeletonPointYtextBox.Size = new System.Drawing.Size(50, 19);
+            this.SkeletonPointYtextBox.TabIndex = 31;
+            // 
+            // SkeletonPointZtextBox
+            // 
+            this.SkeletonPointZtextBox.Location = new System.Drawing.Point(444, 60);
+            this.SkeletonPointZtextBox.Name = "SkeletonPointZtextBox";
+            this.SkeletonPointZtextBox.Size = new System.Drawing.Size(50, 19);
+            this.SkeletonPointZtextBox.TabIndex = 32;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(171, 33);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(38, 12);
+            this.label15.TabIndex = 33;
+            this.label15.Text = "Status";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(960, 603);
+            this.Controls.Add(this.label15);
+            this.Controls.Add(this.SkeletonPointZtextBox);
+            this.Controls.Add(this.SkeletonPointYtextBox);
+            this.Controls.Add(this.SkeletonPointXtextBox);
+            this.Controls.Add(this.label14);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.label11);
             this.Controls.Add(this.linkLabelMoreInfo);
             this.Controls.Add(this.textBoxSaveFileNamePrefix);
             this.Controls.Add(this.label9);
@@ -300,7 +384,6 @@
             this.Controls.Add(this.buttonAbortInput);
             this.Controls.Add(this.buttonFinishInput);
             this.Controls.Add(this.buttonStartInput);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.rawYtextBox);
             this.Controls.Add(this.finishButton);
@@ -347,7 +430,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox rawXtextBox;
         private System.Windows.Forms.TextBox rawYtextBox;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button buttonStartInput;
         private System.Windows.Forms.Button buttonFinishInput;
         private System.Windows.Forms.Button buttonAbortInput;
@@ -356,6 +438,15 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxSaveFileNamePrefix;
         private System.Windows.Forms.LinkLabel linkLabelMoreInfo;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox SkeletonPointXtextBox;
+        private System.Windows.Forms.TextBox SkeletonPointYtextBox;
+        private System.Windows.Forms.TextBox SkeletonPointZtextBox;
+        private System.Windows.Forms.Label label15;
     }
 }
 

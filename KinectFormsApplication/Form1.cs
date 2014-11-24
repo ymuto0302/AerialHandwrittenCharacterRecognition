@@ -8,16 +8,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Kinect;
-using Microsoft.Kinect.Toolkit.Interaction; // 2014.10.20 追加
+using Microsoft.Kinect.Toolkit.Interaction;
 using System.Runtime.InteropServices;
-using Microsoft.Kinect.Toolkit.Controls; //2014.10.22 追加（ハンドカーソル利用のため）
-using System.Diagnostics; // for Stopwatch()
+using Microsoft.Kinect.Toolkit.Controls; // ハンドカーソル利用のため
 using System.IO;
 
 namespace KinectFormsApplication
 {
     public partial class Form1 : Form
     {
+        //右手座標の保存にあたり，color image 上および skeleton 上の座標の両方を保存したい
+        class HandPoint
+        {
+            public ColorImagePoint colorImagePoint;
+            public SkeletonPoint skeletonPoint;
+
+            public HandPoint(ColorImagePoint c, SkeletonPoint s)
+            {
+                colorImagePoint = c;
+                skeletonPoint = s;
+            } 
+        }
+
         readonly int Bgr32BytesPerPixel = 4; //ピクセルあたりのバイト数
         InteractionStream interactionStream;
         InteractionHandEventType handEventType = InteractionHandEventType.GripRelease; //初期状態＝パー
@@ -34,10 +46,8 @@ namespace KinectFormsApplication
 
         string saveFileName = "";   //座標列を保存するファイル名
 
-        ////Stopwatch stopWatch;
-
-        //右手座標とその取得時刻を保存するためのリスト
-        List<ColorImagePoint> rightHandCoordinates = new List<ColorImagePoint>();
+        //右手座標を保存するためのリスト
+        List<HandPoint> rightHandCoordinates = new List<HandPoint>();
 
         public Form1()
         {
@@ -50,11 +60,6 @@ namespace KinectFormsApplication
             eventTimer.Interval = EventInterval; // interval
             eventTimer.Tick += new System.EventHandler(eventTimer_Tick);
             eventTimer.Enabled = true;
-
-            //ストップウォッチ
-            // http://msdn.microsoft.com/ja-jp/library/cc708866.aspx
-            /////stopWatch = new Stopwatch();
-            /////stopWatch.Start();
 
             try
             {
@@ -105,8 +110,7 @@ namespace KinectFormsApplication
 
             kinect.Start();
 
-            //2014.10.20 追加
-            //インタラクションライブラリの初期化
+            //インタラクションライブラリの初期化 (2014.10.20 追加)
             interactionStream = new InteractionStream(kinect, new NewInteractionClient());
             interactionStream.InteractionFrameReady += new EventHandler<InteractionFrameReadyEventArgs>(interactionstream_InteractionFrameReady);
             //interactionStream.InteractionFrameReady += interactionstream_InteractionFrameReady;
@@ -488,7 +492,7 @@ namespace KinectFormsApplication
             {
                 if (depthFrame != null)
                 {
-                    // 2014.10.20 追加
+                    // InteractionStream に深度情報を流しこむ (2014.10.20 追加)
                     interactionStream.ProcessDepth(depthFrame.GetRawPixelData(), depthFrame.Timestamp);
 
                     depthFrame.Dispose();
@@ -508,7 +512,7 @@ namespace KinectFormsApplication
                     Skeleton[] skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
                     skeletonFrame.CopySkeletonDataTo(skeletons);
 
-                    // 2014.10.20 追加
+                    // InteractionStream にスケルトン情報を流しこむ (2014.10.20 追加)
                     interactionStream.ProcessSkeleton(skeletons, kinect.AccelerometerGetCurrentReading(), skeletonFrame.Timestamp);
 
                     //トラッキングされているスケルトンのジョイントを描画する
@@ -521,8 +525,13 @@ namespace KinectFormsApplication
 
                         //右手座標の表示
                         ColorImagePoint rightHandPoint = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(jointHandRight.Position, kinect.ColorStream.Format);
+                        SkeletonPointXtextBox.Text = String.Format("{0:0.000}", jointHandRight.Position.X);
+                        SkeletonPointYtextBox.Text = String.Format("{0:0.000}", jointHandRight.Position.Y);
+                        SkeletonPointZtextBox.Text = String.Format("{0:0.000}", jointHandRight.Position.Z);
+
                         rawXtextBox.Text = String.Format("{0:000}", rightHandPoint.X);
                         rawYtextBox.Text = String.Format("{0:000}", rightHandPoint.Y);
+
 
                         //ジョイントの描画
                         foreach (Joint joint in skeleton.Joints)
@@ -545,7 +554,7 @@ namespace KinectFormsApplication
                         if (t % 10 == 0)
                         {
                             //rightHandCoordinates.Add(point);
-                            rightHandCoordinates.Add(point);
+                            rightHandCoordinates.Add(new HandPoint(point, jointHandRight.Position));
                         }
 
                         gHand.DrawEllipse(new Pen(Brushes.Red), new Rectangle(point.X, point.Y, 10, 10)); 
@@ -599,11 +608,13 @@ namespace KinectFormsApplication
         {
             //記録した右手座標をコンソールに出力（とりあえず）
             StreamWriter sw = new StreamWriter(new FileStream(saveFileName, FileMode.Create));
-            foreach (ColorImagePoint pt in rightHandCoordinates)
+            foreach (HandPoint pt in rightHandCoordinates)
             {
-                //（注意）pt が従う座標系の縦軸は「下向きに正」であるため，その向きを反転する
+                //（注意）pt のうち ColorImage が従う座標系の縦軸は「下向きに正」であるため，その向きを反転する
                 //（メモ）DPマッチングにおいてベクトルを扱う際，この変換が必要となる
-                sw.WriteLine("{0,0:000} {1,0:000}", pt.X, pictureBoxRgb.Height - pt.Y);
+                sw.WriteLine("{0,0:000} {1,0:000} {2,0:0.000} {3,0:0.000} {4,0:0.000}",
+                    pt.colorImagePoint.X, pictureBoxRgb.Height - pt.colorImagePoint.Y,
+                    pt.skeletonPoint.X, pt.skeletonPoint.Y, pt.skeletonPoint.Z);
                 //System.Console.WriteLine("(%d, %d)", pt.X, pt.Y);
             }
             sw.Close();
@@ -653,5 +664,6 @@ namespace KinectFormsApplication
         {
             System.Diagnostics.Process.Start(e.Link.LinkData.ToString());
         }
+
     }
 }
