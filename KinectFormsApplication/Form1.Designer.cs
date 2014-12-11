@@ -222,7 +222,7 @@
             // buttonFinishInput
             // 
             this.buttonFinishInput.Enabled = false;
-            this.buttonFinishInput.Location = new System.Drawing.Point(832, 39);
+            this.buttonFinishInput.Location = new System.Drawing.Point(833, 38);
             this.buttonFinishInput.Name = "buttonFinishInput";
             this.buttonFinishInput.Size = new System.Drawing.Size(114, 22);
             this.buttonFinishInput.TabIndex = 16;

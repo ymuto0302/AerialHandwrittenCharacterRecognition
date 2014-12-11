@@ -57,9 +57,11 @@ namespace KinectFormsApplication
             canvas = new Bitmap(pictureBoxHand.Width, pictureBoxHand.Height);
 
             //タイマー
+            /*
             eventTimer.Interval = EventInterval; // interval
             eventTimer.Tick += new System.EventHandler(eventTimer_Tick);
             eventTimer.Enabled = true;
+            */
 
             try
             {
@@ -106,7 +108,7 @@ namespace KinectFormsApplication
             kinect.ColorStream.Enable();
             kinect.DepthStream.Enable();
             kinect.SkeletonStream.Enable();
-            //kinect.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(kinect_AllFramesReady);
+            kinect.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(kinect_AllFramesReady);
 
             kinect.Start();
 
@@ -156,127 +158,114 @@ namespace KinectFormsApplication
         /// <param name="e"></param>
         void kinect_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
+            KinectSensor kinect = KinectSensor.KinectSensors[0];
 
-            try
+            String kinectInfo = "kinect.status : " + kinect.Status + System.Environment.NewLine
+                + "ColorStream.Format : " + kinect.ColorStream.Format + System.Environment.NewLine
+                + "CameraSettings.FrameInterval : " + kinect.ColorStream.CameraSettings.FrameInterval + System.Environment.NewLine
+                + "CameraSettings.MinFrameInterval : " + kinect.ColorStream.CameraSettings.MinFrameInterval + System.Environment.NewLine
+                + "CameraSettings.MaxFrameInterval : " + kinect.ColorStream.CameraSettings.MaxFrameInterval;
+            kinectInformationTextBox.Text = kinectInfo;
+
+            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
-                KinectSensor kinect = sender as KinectSensor;
-                if (kinect == null)
+                if (colorFrame != null)
                 {
-                    return;
-                }
-                String kinectInfo = "kinect.status : " + kinect.Status + System.Environment.NewLine
-                    +"ColorStream.Format : " + kinect.ColorStream.Format + System.Environment.NewLine
-                    + "CameraSettings.FrameInterval : " + kinect.ColorStream.CameraSettings.FrameInterval + System.Environment.NewLine
-                    + "CameraSettings.MinFrameInterval : " + kinect.ColorStream.CameraSettings.MinFrameInterval + System.Environment.NewLine
-                    +"CameraSettings.MaxFrameInterval : " + kinect.ColorStream.CameraSettings.MaxFrameInterval;
-                kinectInformationTextBox.Text = kinectInfo;
+                    frameCounterTextBox.Text = countColorFrame.ToString();
+                    countColorFrame += 1;
 
-                //現在の日付を利用して bitmap を書き込むファイル名を決定
-                DateTime dt = System.DateTime.Now;
-                string fileName = String.Format("{0:0000}{1:00}{2:00}{3:00}{4:00}{5:00}{6:000}.jpg",
-                    dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Millisecond);
+                    //RGBカメラのピクセルデータの取得
+                    byte[] colorPixel = new byte[colorFrame.PixelDataLength];
+                    colorFrame.CopyPixelDataTo(colorPixel);
 
-                //RGBカメラのフレームデータを取得
-                using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
-                {
-                    if (colorFrame != null)
-                    {
-                        frameCounterTextBox.Text = countColorFrame.ToString();
-                        countColorFrame += 1;
+                    //ピクセルデータをビットマップに変換
+                    Bitmap bitmap = new Bitmap(kinect.ColorStream.FrameWidth, kinect.ColorStream.FrameHeight, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
 
-                        //RGBカメラのピクセルデータの取得
-                        byte[] colorPixel = new byte[colorFrame.PixelDataLength];
-                        colorFrame.CopyPixelDataTo(colorPixel);
+                    Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+                    System.Drawing.Imaging.BitmapData data = bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+                    Marshal.Copy(colorPixel, 0, data.Scan0, colorPixel.Length);
+                    bitmap.UnlockBits(data);
 
-                        //ピクセルデータをビットマップに変換
-                        Bitmap bitmap = new Bitmap(kinect.ColorStream.FrameWidth, kinect.ColorStream.FrameHeight, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+                    pictureBoxRgb.Image = bitmap;
 
-                        Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
-                        System.Drawing.Imaging.BitmapData data = bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-                        Marshal.Copy(colorPixel, 0, data.Scan0, colorPixel.Length);
-                        bitmap.UnlockBits(data);
-
-                        pictureBoxRgb.Image = bitmap;
-
-                        //ファイルへの書き出し (2014.10.20 コメントアウト）
-                        //bitmap.Save(fileName, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    }
-                }
-
-                //距離カメラのフレームデータの取得
-                using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
-                {
-                    if (depthFrame != null)
-                    {
-                        // 2014.10.20 追加
-                        interactionStream.ProcessDepth(depthFrame.GetRawPixelData(), depthFrame.Timestamp);
-
-                        //距離データの画像化
-                        /*
-                        Bitmap bitmap = new Bitmap(kinect.DepthStream.FrameWidth, kinect.DepthStream.FrameHeight, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-
-                        Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
-                        System.Drawing.Imaging.BitmapData data = bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-                        byte[] gray = ConvertDepthColor(kinect, depthFrame);
-                        Marshal.Copy(gray, 0, data.Scan0, gray.Length);
-                        bitmap.UnlockBits(data);
-
-                        pictureBoxDepth.Image = bitmap;
-                         */
-                    }
-                }
-
-                //スケルトンフレームの取得
-                using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
-                {
-                    if (skeletonFrame != null)
-                    {
-                        const int R = 5;
-                        Graphics g = Graphics.FromImage(pictureBoxRgb.Image);
-                        Graphics gHand = Graphics.FromImage(canvas);
-
-                        //スケルトンのデータの取得
-                        Skeleton[] skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
-                        skeletonFrame.CopySkeletonDataTo(skeletons);
-
-                        // 2014.10.20 追加
-                        interactionStream.ProcessSkeleton(skeletons, kinect.AccelerometerGetCurrentReading(), skeletonFrame.Timestamp);
-
-                        //トラッキングされているスケルトンのジョイントを描画する
-                        foreach (var skeleton in skeletons)
-                        {
-                            if (skeleton.TrackingState != SkeletonTrackingState.Tracked) continue;
-
-                            //右手ジョイントの位置を保存
-                            jointHandRight = skeleton.Joints[JointType.HandRight];
-
-                            //ジョイントの描画
-                            foreach (Joint joint in skeleton.Joints)
-                            {
-                                if (joint.TrackingState != JointTrackingState.Tracked) continue;
-
-
-                                //スケルトンの座標を「RGBカメラの座標」に変換して円を描く
-                                ColorImagePoint point = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Position, kinect.ColorStream.Format);
-                                g.DrawEllipse(new Pen(Brushes.Red), new Rectangle(point.X - R, point.Y - R, R * 2, R * 2));
-                            }
-                        }
-
-                        if(handEventType == InteractionHandEventType.Grip){
-                            ColorImagePoint point = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(jointHandRight.Position, kinect.ColorStream.Format);
-                            gHand.DrawEllipse(new Pen(Brushes.Red), new Rectangle(point.X, point.Y, 10, 10)); 
-                                        
-                            //リソースを解放する
-                            gHand.Dispose();
-                            //PictureBox1に表示する
-                            pictureBoxHand.Image = canvas;
-                        }
-                    }
+                    colorFrame.Dispose();
                 }
             }
-            catch (Exception ex)
+
+            //距離カメラのフレームデータの取得
+            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
             {
-                MessageBox.Show(ex.Message);
+                if (depthFrame != null)
+                {
+                    // InteractionStream に深度情報を流しこむ (2014.10.20 追加)
+                    interactionStream.ProcessDepth(depthFrame.GetRawPixelData(), depthFrame.Timestamp);
+
+                    depthFrame.Dispose();
+                }
+            }
+
+            //スケルトンフレームの取得
+            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+            {
+                if (skeletonFrame != null)
+                {
+                    const int R = 5;
+                    Graphics g = Graphics.FromImage(pictureBoxRgb.Image);
+                    Graphics gHand = Graphics.FromImage(canvas);
+
+                    //スケルトンのデータの取得
+                    Skeleton[] skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
+                    skeletonFrame.CopySkeletonDataTo(skeletons);
+
+                    // InteractionStream にスケルトン情報を流しこむ (2014.10.20 追加)
+                    interactionStream.ProcessSkeleton(skeletons, kinect.AccelerometerGetCurrentReading(), skeletonFrame.Timestamp);
+
+                    //トラッキングされているスケルトンのジョイントを描画する
+                    foreach (var skeleton in skeletons)
+                    {
+                        if (skeleton.TrackingState != SkeletonTrackingState.Tracked) continue;
+
+                        //右手ジョイントの位置を保存
+                        jointHandRight = skeleton.Joints[JointType.HandRight];
+
+                        //右手座標の表示
+                        ColorImagePoint rightHandPoint = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(jointHandRight.Position, kinect.ColorStream.Format);
+                        SkeletonPointXtextBox.Text = String.Format("{0:0.000}", jointHandRight.Position.X);
+                        SkeletonPointYtextBox.Text = String.Format("{0:0.000}", jointHandRight.Position.Y);
+                        SkeletonPointZtextBox.Text = String.Format("{0:0.000}", jointHandRight.Position.Z);
+
+                        rawXtextBox.Text = String.Format("{0:000}", rightHandPoint.X);
+                        rawYtextBox.Text = String.Format("{0:000}", rightHandPoint.Y);
+
+
+                        //ジョイントの描画
+                        foreach (Joint joint in skeleton.Joints)
+                        {
+                            if (joint.TrackingState != JointTrackingState.Tracked) continue;
+
+                            //スケルトンの座標を「RGBカメラの座標」に変換して円を描く
+                            ColorImagePoint point = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Position, kinect.ColorStream.Format);
+                            g.DrawEllipse(new Pen(Brushes.Red), new Rectangle(point.X - R, point.Y - R, R * 2, R * 2));
+                        }
+                    }
+
+                    if (isRecording && handEventType == InteractionHandEventType.Grip)
+                    {
+                        ColorImagePoint point = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(jointHandRight.Position, kinect.ColorStream.Format);
+
+                        //rightHandCoordinates.Add(point);
+                        rightHandCoordinates.Add(new HandPoint(point, jointHandRight.Position));
+
+                        gHand.DrawEllipse(new Pen(Brushes.Red), new Rectangle(point.X, point.Y, 10, 10));
+
+                        //リソースを解放する
+                        gHand.Dispose();
+                        //PictureBox1に表示する
+                        pictureBoxHand.Image = canvas;
+                    }
+
+                    skeletonFrame.Dispose();
+                }
             }
         }
 
@@ -612,7 +601,7 @@ namespace KinectFormsApplication
             {
                 //（注意）pt のうち ColorImage が従う座標系の縦軸は「下向きに正」であるため，その向きを反転する
                 //（メモ）DPマッチングにおいてベクトルを扱う際，この変換が必要となる
-                sw.WriteLine("{0,0:000} {1,0:000} {2,0:0.000} {3,0:0.000} {4,0:0.000}",
+                sw.WriteLine("{0,0:000} {1,0:000} {2,0:F6} {3,0:F6} {4,0:F6}",
                     pt.colorImagePoint.X, pictureBoxRgb.Height - pt.colorImagePoint.Y,
                     pt.skeletonPoint.X, pt.skeletonPoint.Y, pt.skeletonPoint.Z);
                 //System.Console.WriteLine("(%d, %d)", pt.X, pt.Y);
